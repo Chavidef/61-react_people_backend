@@ -38,5 +38,21 @@ namespace _61_react_people_backend.Data
             context.People.Update(person);
             context.SaveChanges();
         }
+        public void DeletePeople(List<Person> people)
+        {
+            //using var context = new PeopleDataContext(_connectionString);
+            //foreach(int id in ids)
+            //{
+            //    context.Database.ExecuteSqlInterpolated($"DELETE FROM People WHERE Id = {id}");
+            //};
+            //context.SaveChanges();
+
+            using var context = new PeopleDataContext(_connectionString);
+            foreach (var person in people)
+            {
+                context.People.Remove(person);
+            }
+            context.SaveChanges();
+        }
     }
 }

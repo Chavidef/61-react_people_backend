@@ -11,7 +11,8 @@ class PeopleTable extends React.Component {
             lastName: '',
             age:''
         },
-        editMode: false
+        editMode: false,
+        selectedPeople:[]
     }
 
     componentDidMount() {
@@ -45,7 +46,7 @@ class PeopleTable extends React.Component {
         });
         this.loadTable();
     }
-    onDeleteClick = ({ id }) => {
+    onDeleteClick =  id  => {
         axios.post('/api/people/deleteperson', { id }).then(() => {
             this.loadTable();
         })
@@ -66,6 +67,38 @@ class PeopleTable extends React.Component {
                 },
                 editMode: false
             })
+        })
+    }
+    onCancelClick = () => {
+        this.setState({
+            person: {
+                firstName: '',
+                lastName: '',
+                age: ''
+            },
+            editMode: false
+        })
+    }
+    onSelectChange = p => {
+        const { selectedPeople } = this.state;
+        if (selectedPeople.includes(p)) {
+            this.setState({ selectedPeople: selectedPeople.filter(s => s.id !== p.id) });
+        }
+        else {
+            this.setState({ selectedPeople: [...selectedPeople, p] });
+        }
+        console.log(selectedPeople);
+    }
+    onCheckAllClick = () => {
+        this.setState({selectedPeople: this.state.people})
+    }
+    onUncheckAllClick = () => {
+        this.setState({ selectedPeople:[] })
+    }
+    onDeleteSelectedClick = () => {
+        axios.post('/api/people/deletepeople', this.state.selectedPeople).then(() => {
+            this.loadTable();
+            this.setState({ selectedPeople:[] })
         })
     }
 
@@ -90,13 +123,13 @@ class PeopleTable extends React.Component {
                         <tr>
                             <td>
                                     <div className ='row mt-1'>
-                                        <button className='btn btn-danger col-md-8'>Delete Selected</button>
+                                        <button onClick={this.onDeleteSelectedClick} className='btn btn-danger col-md-8'>Delete Selected</button>
                                     </div>
                                     <div className='row mt-1'>
-                                        <button className='btn btn-primary col-md-8'>Check All</button>
+                                        <button onClick={this.onCheckAllClick} className='btn btn-primary col-md-8'>Check All</button>
                                     </div>
                                     <div className='row mt-1'>
-                                        <button className='btn btn-primary col-md-8'>Uncheck All</button>
+                                        <button onClick={this.onUncheckAllClick} className='btn btn-primary col-md-8'>Uncheck All</button>
                                     </div>
                             </td>
                             <td>First Name</td>
@@ -114,8 +147,8 @@ class PeopleTable extends React.Component {
                                     onEditClick={() => this.onEditClick(p)}
                                     onDeleteClick={() => this.onDeleteClick(p.id)}
                                     onSelectChange={() => this.onSelectChange(p)}
-                                    
-                                //    isSelected={this.isSelected(p)}
+
+                                    isSelected={this.state.selectedPeople.includes(p)}
                                 />)}
                     </tbody>
                     </table>

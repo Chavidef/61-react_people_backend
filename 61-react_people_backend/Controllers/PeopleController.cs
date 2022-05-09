@@ -49,5 +49,12 @@ namespace _61_react_people_backend.Controllers
             var repo = new PeopleRepository(_connectionString);
             repo.UpdatePerson(person);
         }
+        [Route("deletepeople")]
+        [HttpPost]
+        public void DeletePeople(List<Person>people)
+        {
+            var repo = new PeopleRepository(_connectionString);
+            repo.DeletePeople(people);
+        }
     }
 }
