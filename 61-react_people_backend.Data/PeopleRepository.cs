@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,6 +25,18 @@ namespace _61_react_people_backend.Data
             context.People.Add(person);
             context.SaveChanges();
             return person.Id;
+        }
+        public void DeletePerson(int id)
+        {
+            using var context = new PeopleDataContext(_connectionString);
+            context.Database.ExecuteSqlInterpolated($"DELETE FROM People WHERE Id = {id}");
+            context.SaveChanges();
+        }
+        public void UpdatePerson(Person person)
+        {
+            using var context = new PeopleDataContext(_connectionString);
+            context.People.Update(person);
+            context.SaveChanges();
         }
     }
 }

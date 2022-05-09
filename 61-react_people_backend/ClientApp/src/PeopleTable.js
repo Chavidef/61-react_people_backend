@@ -1,16 +1,17 @@
 ﻿import React from 'react';
 import PersonForm from './PersonForm';
 import axios from 'axios';
+import PersonRow from './PersonRow';
 
 class PeopleTable extends React.Component {
     state = {
         people: [],
         person: {
-            id:'',
             firstName: '',
             lastName: '',
             age:''
-        }
+        },
+        editMode: false
     }
 
     componentDidMount() {
@@ -44,9 +45,32 @@ class PeopleTable extends React.Component {
         });
         this.loadTable();
     }
+    onDeleteClick = ({ id }) => {
+        axios.post('/api/people/deleteperson', { id }).then(() => {
+            this.loadTable();
+        })
+    }
+
+    onEditClick = p => {
+        this.setState({ person: p, editMode: true });
+    }
+
+    onUpdateClick = () => {
+        axios.post('/api/people/updateperson', this.state.person).then(() => {
+            this.loadTable();
+            this.setState({
+                person:{
+                    firstName: '',
+                    lastName: '',
+                    age:''
+                },
+                editMode: false
+            })
+        })
+    }
 
     render() {
-        const { person} = this.state;
+        const { person, editMode } = this.state;
         const { firstName, lastName, age } = person;
         return (
             <>
@@ -56,6 +80,9 @@ class PeopleTable extends React.Component {
                     age={age}
                     onTextChange={this.onTextChange}
                     onAddClick={this.onAddClick}
+                    isEditing={editMode}
+                    onUpdateClick={this.onUpdateClick}
+                    onCancelClick={this.onCancelClick}
                 />
                 <div className ='container'>
                 <table className='table table-hover table-striped table-bordered mt-5'>
@@ -79,8 +106,17 @@ class PeopleTable extends React.Component {
 
                         </tr>
                     </thead>
-                    <tbody>
-                        {/*{this.generateBody()}*/}
+                        <tbody>
+                            {this.state.people.map(p =>
+                                 <PersonRow
+                                    person={p}
+                                    key={p.id}
+                                    onEditClick={() => this.onEditClick(p)}
+                                    onDeleteClick={() => this.onDeleteClick(p.id)}
+                                    onSelectChange={() => this.onSelectChange(p)}
+                                    
+                                //    isSelected={this.isSelected(p)}
+                                />)}
                     </tbody>
                     </table>
                 </div>
